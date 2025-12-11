@@ -5,6 +5,7 @@ import { query } from './_generated/server'
 import { zMutation, zQuery } from './zodConvex'
 
 export const postSchema = z.object({
+  title: z.string(),
   slug: z.string(),
   body: z.string(),
   authorId: zid('users'),
@@ -64,6 +65,7 @@ export const create = zMutation({
     }
 
     return await ctx.db.insert('posts', {
+      title: args.title,
       body: args.body,
       authorId: currentUserId,
       publishedAt: args.publishedAt,
@@ -94,6 +96,7 @@ export const update = zMutation({
     }
 
     return await ctx.db.patch(args.id, {
+      title: args.title,
       body: args.body,
       publishedAt: args.publishedAt,
     })
