@@ -1,5 +1,8 @@
 # Temp Blog
 
+> [!NOTE]
+> This is a project under development, and is not feature-complete by any means.
+
 This application is a **private blog platform** where users can write personal blog posts in complete privacy, while still experiencing the feeling of having an engaged audience through AI-generated replies.
 
 ## Core Concept
