@@ -25,7 +25,7 @@ function RouteComponent() {
           ? 'Draft'
           : new Date(post.publishedAt).toLocaleDateString()}
       </p>
-      <div>{post.body}</div>
+      <div className="whitespace-pre-wrap">{post.body}</div>
     </div>
   )
 }
