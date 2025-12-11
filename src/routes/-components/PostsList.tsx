@@ -14,7 +14,7 @@ export function PostsList() {
   })
 
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full max-w-2xl mx-auto p-8">
       <h1 className="text-2xl font-bold mb-6">Your Posts</h1>
       {sortedPosts === undefined ? (
         <div className="flex items-center gap-2">

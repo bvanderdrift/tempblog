@@ -9,7 +9,7 @@ function App() {
   const { isAuthenticated, isLoading } = useConvexAuth()
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8">
+    <div>
       {isLoading ? (
         <div>Loading...</div>
       ) : isAuthenticated ? (

@@ -14,9 +14,11 @@ export function LoginView() {
   })
 
   return (
-    <Button onClick={() => signIn()}>
-      <Github className="size-4" /> Sign in with GitHub
-      {isPending && <Loader2 className="size-4 animate-spin" />}
-    </Button>
+    <div className="flex justify-center items-center h-screen">
+      <Button onClick={() => signIn()}>
+        <Github className="size-4" /> Sign in with GitHub
+        {isPending && <Loader2 className="size-4 animate-spin" />}
+      </Button>
+    </div>
   )
 }
