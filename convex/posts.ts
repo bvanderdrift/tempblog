@@ -2,7 +2,14 @@ import { getAuthUserId } from '@convex-dev/auth/server'
 import { zid } from 'convex-helpers/server/zod4'
 import { z } from 'zod'
 import { query } from './_generated/server'
-import { zMutation } from './zodConvex'
+import { zMutation, zQuery } from './zodConvex'
+
+export const postSchema = z.object({
+  slug: z.string(),
+  body: z.string(),
+  authorId: zid('users'),
+  publishedAt: z.union([z.number(), z.null()]),
+})
 
 export const list = query({
   args: {},
@@ -20,11 +27,35 @@ export const list = query({
   },
 })
 
-export const create = zMutation({
-  args: {
-    body: z.string(),
-    publishedAt: z.union([z.number(), z.null()]),
+export const getBySlug = zQuery({
+  args: postSchema.pick({ slug: true }),
+  handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx)
+
+    if (!currentUserId) {
+      throw new Error('Unauthorized')
+    }
+
+    const post = await ctx.db
+      .query('posts')
+      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
+      .first()
+
+    if (!post) {
+      return null
+    }
+
+    // Only return post if it belongs to the current user
+    if (post.authorId !== currentUserId) {
+      throw new Error('Unauthorized')
+    }
+
+    return post
   },
+})
+
+export const create = zMutation({
+  args: postSchema.omit({ authorId: true }),
   handler: async (ctx, args) => {
     const currentUserId = await getAuthUserId(ctx)
 
@@ -36,16 +67,15 @@ export const create = zMutation({
       body: args.body,
       authorId: currentUserId,
       publishedAt: args.publishedAt,
+      slug: args.slug,
     })
   },
 })
 
 export const update = zMutation({
-  args: {
+  args: postSchema.omit({ authorId: true }).extend({
     id: zid('posts'),
-    body: z.string(),
-    publishedAt: z.union([z.number(), z.null()]),
-  },
+  }),
   handler: async (ctx, args) => {
     const currentUserId = await getAuthUserId(ctx)
 
