@@ -1,6 +1,7 @@
 {
   "name": "tempblog",
   "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "scripts": {
     "start": "vite dev --port 3000",
