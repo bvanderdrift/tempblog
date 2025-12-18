@@ -51,7 +51,27 @@ export const getBySlug = zQuery({
       throw new Error('Unauthorized')
     }
 
-    return post
+    // Fetch comments for this post
+    const comments = await ctx.db
+      .query('comments')
+      .withIndex('by_post', (q) => q.eq('postId', post._id))
+      .collect()
+
+    // Fetch agent data for each comment
+    const commentsWithAuthors = await Promise.all(
+      comments.map(async (comment) => {
+        const author = await ctx.db.get(comment.authorId)
+        return {
+          ...comment,
+          author,
+        }
+      }),
+    )
+
+    return {
+      ...post,
+      comments: commentsWithAuthors,
+    }
   },
 })
 
