@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery } from 'convex/react'
 import { ChevronRight, MessageCircle, Trash2 } from 'lucide-react'
-import { api } from '../../../convex/_generated/api'
+import Markdown from 'react-markdown'
 import { Comment, type CommentData } from '../-components/Comment'
+import { api } from '../../../convex/_generated/api'
 
 export const Route = createFileRoute('/posts/$slug')({
   component: RouteComponent,
@@ -95,15 +96,15 @@ function RouteComponent() {
           </Button>
         </ConfirmDeleteDialog>
       </div>
-      <div className="whitespace-pre-wrap">{post.body}</div>
+      <div className="prose prose-neural dark:prose-invert">
+        <Markdown>{post.body}</Markdown>
+      </div>
 
       {/* Comments Section */}
       <section className="mt-12 pt-8 border-t border-border">
         <div className="flex items-center gap-2 mb-6">
           <MessageCircle className="size-5 text-muted-foreground" />
-          <h2 className="text-lg font-semibold">
-            Thoughts from your readers
-          </h2>
+          <h2 className="text-lg font-semibold">Thoughts from your readers</h2>
           <span className="text-sm text-muted-foreground">
             ({STUBBED_COMMENTS.length})
           </span>
