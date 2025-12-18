@@ -27,7 +27,7 @@ export default defineSchema({
   posts: defineTable(zodOutputToConvex(postSchema))
     .index('by_user', ['authorId'])
     .index('by_slug', ['slug']),
-  comments: defineTable(zodOutputToConvex(commentSchema)).index('by_post', [
-    'postId',
-  ]),
+  comments: defineTable(zodOutputToConvex(commentSchema))
+    .index('by_post', ['postId'])
+    .index('by_author', ['authorId']),
 })

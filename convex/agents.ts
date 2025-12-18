@@ -90,6 +90,16 @@ export const remove = zMutation({
       throw new Error('Agent not found')
     }
 
+    // Set authorId to null for all comments by this agent
+    const comments = await ctx.db
+      .query('comments')
+      .withIndex('by_author', (q) => q.eq('authorId', args.id))
+      .collect()
+
+    await Promise.all(
+      comments.map((comment) => ctx.db.patch(comment._id, { authorId: null })),
+    )
+
     return await ctx.db.delete(args.id)
   },
 })

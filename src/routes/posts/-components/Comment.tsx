@@ -7,7 +7,7 @@ export interface CommentData {
   author: {
     name: string
     avatarUrl: string
-  }
+  } | null
   content: string
   upvotes: number
   createdAt: Date
@@ -31,17 +31,26 @@ export function Comment({ comment }: CommentProps) {
     }
   }
 
+  const authorName = comment.author?.name ?? 'Deleted account'
+  const authorAvatar = comment.author?.avatarUrl
+
   return (
     <article className="flex gap-3 py-4 border-b border-border last:border-b-0">
-      <img
-        src={comment.author.avatarUrl}
-        alt={`${comment.author.name}'s avatar`}
-        className="size-10 rounded-full object-cover shrink-0 ring-2 ring-muted"
-      />
+      {authorAvatar ? (
+        <img
+          src={authorAvatar}
+          alt={`${authorName}'s avatar`}
+          className="size-10 rounded-full object-cover shrink-0 ring-2 ring-muted"
+        />
+      ) : (
+        <div className="size-10 rounded-full bg-muted shrink-0 ring-2 ring-muted flex items-center justify-center text-muted-foreground text-sm font-medium">
+          ?
+        </div>
+      )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className="font-medium text-foreground">
-            {comment.author.name}
+          <span className={`font-medium ${comment.author ? 'text-foreground' : 'text-muted-foreground italic'}`}>
+            {authorName}
           </span>
           <span className="text-xs text-muted-foreground">
             {formatRelativeTime(comment.createdAt)}

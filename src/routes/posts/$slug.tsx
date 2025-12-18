@@ -22,18 +22,13 @@ function RouteComponent() {
 
   const comments: CommentData[] = useMemo(() => {
     if (!post?.comments) return []
-    return post.comments
-      .filter((comment) => comment.author !== null)
-      .map((comment) => ({
-        id: comment._id,
-        author: {
-          name: comment.author!.name,
-          avatarUrl: comment.author!.avatarUrl,
-        },
-        content: comment.content,
-        upvotes: comment.upvotes,
-        createdAt: new Date(comment._creationTime),
-      }))
+    return post.comments.map((comment) => ({
+      id: comment._id,
+      author: comment.author,
+      content: comment.content,
+      upvotes: comment.upvotes,
+      createdAt: new Date(comment._creationTime),
+    }))
   }, [post?.comments])
 
   const handleDelete = async () => {

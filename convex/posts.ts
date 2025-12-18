@@ -87,7 +87,9 @@ export const getBySlug = zQuery({
     // Fetch agent data for each comment
     const commentsWithAuthors = await Promise.all(
       comments.map(async (comment) => {
-        const author = await ctx.db.get(comment.authorId)
+        const author = comment.authorId
+          ? await ctx.db.get(comment.authorId)
+          : null
         return {
           ...comment,
           author,
@@ -176,6 +178,14 @@ export const remove = zMutation({
     if (post.authorId !== currentUserId) {
       throw new Error('Unauthorized')
     }
+
+    // Delete all comments for this post first
+    const comments = await ctx.db
+      .query('comments')
+      .withIndex('by_post', (q) => q.eq('postId', args.id))
+      .collect()
+
+    await Promise.all(comments.map((comment) => ctx.db.delete(comment._id)))
 
     return await ctx.db.delete(args.id)
   },
