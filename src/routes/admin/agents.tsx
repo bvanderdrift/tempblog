@@ -263,7 +263,9 @@ function AgentDialog({ open, onOpenChange, agent, onSave }: AgentDialogProps) {
                 aria-invalid={!!errors.name}
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -362,4 +364,3 @@ function AgentDialog({ open, onOpenChange, agent, onSave }: AgentDialogProps) {
     </Dialog>
   )
 }
-
