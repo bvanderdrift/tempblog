@@ -4,7 +4,7 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery } from 'convex/react'
 import { ChevronRight, MessageCircle, Trash2 } from 'lucide-react'
 import Markdown from 'react-markdown'
-import { Comment, type CommentData } from '../-components/Comment'
+import { Comment, type CommentData } from './-components/Comment'
 import { api } from '../../../convex/_generated/api'
 
 export const Route = createFileRoute('/posts/$slug')({
