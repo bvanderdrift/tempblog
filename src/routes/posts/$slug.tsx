@@ -1,8 +1,9 @@
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog'
+import { ConfirmPublishDialog } from '@/components/ConfirmPublishDialog'
 import { Button } from '@/components/ui/button'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery } from 'convex/react'
-import { ChevronRight, MessageCircle, Trash2 } from 'lucide-react'
+import { ChevronRight, MessageCircle, Send, Trash2 } from 'lucide-react'
 import { useMemo } from 'react'
 import Markdown from 'react-markdown'
 import { api } from '../../../convex/_generated/api'
@@ -17,6 +18,7 @@ function RouteComponent() {
   const navigate = useNavigate()
   const post = useQuery(api.posts.getBySlug, { slug })
   const deletePost = useMutation(api.posts.remove)
+  const publishPost = useMutation(api.posts.publish)
 
   const comments: CommentData[] = useMemo(() => {
     if (!post?.comments) return []
@@ -38,6 +40,11 @@ function RouteComponent() {
     if (!post) return
     await deletePost({ id: post._id })
     navigate({ to: '/' })
+  }
+
+  const handlePublish = async () => {
+    if (!post) return
+    await publishPost({ id: post._id })
   }
 
   if (post === undefined) {
@@ -66,15 +73,25 @@ function RouteComponent() {
               : new Date(post.publishedAt).toLocaleDateString()}
           </p>
         </div>
-        <ConfirmDeleteDialog onConfirm={handleDelete}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:text-destructive"
-          >
-            <Trash2 className="size-4" />
-          </Button>
-        </ConfirmDeleteDialog>
+        <div className="flex gap-1">
+          {post.publishedAt === null && (
+            <ConfirmPublishDialog onConfirm={handlePublish}>
+              <Button variant="outline" size="sm">
+                <Send className="size-4 mr-1" />
+                Publish
+              </Button>
+            </ConfirmPublishDialog>
+          )}
+          <ConfirmDeleteDialog onConfirm={handleDelete}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-destructive"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </ConfirmDeleteDialog>
+        </div>
       </div>
       <div className="prose prose-neural dark:prose-invert">
         <Markdown>{post.body}</Markdown>

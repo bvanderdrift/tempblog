@@ -8,7 +8,9 @@
  * @module
  */
 
+import type * as agents from "../agents.js";
 import type * as auth from "../auth.js";
+import type * as comments from "../comments.js";
 import type * as http from "../http.js";
 import type * as posts from "../posts.js";
 import type * as zodConvex from "../zodConvex.js";
@@ -20,7 +22,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  agents: typeof agents;
   auth: typeof auth;
+  comments: typeof comments;
   http: typeof http;
   posts: typeof posts;
   zodConvex: typeof zodConvex;

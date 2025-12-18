@@ -1,3 +1,4 @@
+import { ConfirmPublishDialog } from '@/components/ConfirmPublishDialog'
 import { Button } from '@/components/ui/button'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
@@ -31,17 +32,24 @@ function RouteComponent() {
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (publishedAt: number | null) => {
     const slug = slugify(title)
-    await createPost({ title, slug, body, publishedAt: null })
+    await createPost({ title, slug, body, publishedAt })
     navigate({ to: '/posts/$slug', params: { slug } })
   }
+
+  const isFormValid = title.trim() && body.trim()
 
   return (
     <div className="max-w-2xl mx-auto p-8">
       <h1 className="text-2xl font-bold mb-6">New Post</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleSubmit(null)
+        }}
+        className="space-y-4"
+      >
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-1">
             Title
@@ -69,10 +77,18 @@ function RouteComponent() {
             required
           />
         </div>
-        <Button type="submit" disabled={isPending}>
-          Save Draft
-          {isPending && <Loader2 className="size-4 animate-spin" />}
-        </Button>
+        <div className="flex gap-2">
+          <Button type="submit" variant="secondary" disabled={isPending}>
+            Save as Draft
+            {isPending && <Loader2 className="size-4 animate-spin" />}
+          </Button>
+          <ConfirmPublishDialog onConfirm={() => handleSubmit(Date.now())}>
+            <Button type="button" disabled={isPending || !isFormValid}>
+              Publish
+              {isPending && <Loader2 className="size-4 animate-spin" />}
+            </Button>
+          </ConfirmPublishDialog>
+        </div>
       </form>
     </div>
   )

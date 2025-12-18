@@ -95,7 +95,7 @@ export const create = zMutation({
 })
 
 export const update = zMutation({
-  args: postSchema.omit({ authorId: true }).extend({
+  args: postSchema.omit({ authorId: true, publishedAt: true }).extend({
     id: zid('posts'),
   }),
   handler: async (ctx, args) => {
@@ -118,7 +118,6 @@ export const update = zMutation({
     return await ctx.db.patch(args.id, {
       title: args.title,
       body: args.body,
-      publishedAt: args.publishedAt,
     })
   },
 })
@@ -145,5 +144,36 @@ export const remove = zMutation({
     }
 
     return await ctx.db.delete(args.id)
+  },
+})
+
+export const publish = zMutation({
+  args: {
+    id: zid('posts'),
+  },
+  handler: async (ctx, args) => {
+    const currentUserId = await getAuthUserId(ctx)
+
+    if (!currentUserId) {
+      throw new Error('Unauthorized')
+    }
+
+    const post = await ctx.db.get(args.id)
+
+    if (!post) {
+      throw new Error('Post not found')
+    }
+
+    if (post.authorId !== currentUserId) {
+      throw new Error('Unauthorized')
+    }
+
+    if (post.publishedAt !== null) {
+      throw new Error('Post already published')
+    }
+
+    return await ctx.db.patch(args.id, {
+      publishedAt: Date.now(),
+    })
   },
 })

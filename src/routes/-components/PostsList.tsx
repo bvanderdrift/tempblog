@@ -1,15 +1,17 @@
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog'
+import { ConfirmPublishDialog } from '@/components/ConfirmPublishDialog'
 import { Button } from '@/components/ui/button'
 import { getReadingTimeInMinutes } from '@/lib/getReadingTime'
 import { Link } from '@tanstack/react-router'
 import { useMutation, useQuery } from 'convex/react'
-import { Loader2, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Plus, Send, Trash2 } from 'lucide-react'
 import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
 
 export function PostsList() {
   const posts = useQuery(api.posts.list)
   const deletePost = useMutation(api.posts.remove)
+  const publishPost = useMutation(api.posts.publish)
 
   // Sort posts: nulls first, then by publishedAt descending
   const sortedPosts = posts?.slice().sort((a, b) => {
@@ -21,6 +23,10 @@ export function PostsList() {
 
   const handleDelete = async (id: Id<'posts'>) => {
     await deletePost({ id })
+  }
+
+  const handlePublish = async (id: Id<'posts'>) => {
+    await publishPost({ id })
   }
 
   return (
@@ -58,15 +64,30 @@ export function PostsList() {
                     : new Date(post.publishedAt).toLocaleDateString()}
                 </p>
               </Link>
-              <ConfirmDeleteDialog onConfirm={() => handleDelete(post._id)}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              </ConfirmDeleteDialog>
+              <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {post.publishedAt === null && (
+                  <ConfirmPublishDialog
+                    onConfirm={() => handlePublish(post._id)}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-primary"
+                    >
+                      <Send className="size-4" />
+                    </Button>
+                  </ConfirmPublishDialog>
+                )}
+                <ConfirmDeleteDialog onConfirm={() => handleDelete(post._id)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </ConfirmDeleteDialog>
+              </div>
             </li>
           ))}
         </ul>
