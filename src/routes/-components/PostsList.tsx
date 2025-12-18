@@ -1,5 +1,6 @@
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog'
 import { Button } from '@/components/ui/button'
+import { getReadingTimeInMinutes } from '@/lib/getReadingTime'
 import { Link } from '@tanstack/react-router'
 import { useMutation, useQuery } from 'convex/react'
 import { Loader2, Plus, Trash2 } from 'lucide-react'
@@ -48,8 +49,10 @@ export function PostsList() {
                 params={{ slug: post.slug }}
                 className="block border rounded-lg p-4 pr-12 hover:bg-muted/50 transition-colors"
               >
-                <p className="whitespace-pre-wrap">{post.body}</p>
-                <p className="text-sm text-muted-foreground mt-2">
+                <h2 className="font-semibold text-lg">{post.title}</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {getReadingTimeInMinutes(post.body)} min read
+                  <span className="mx-2">·</span>
                   {post.publishedAt === null
                     ? 'Draft'
                     : new Date(post.publishedAt).toLocaleDateString()}
