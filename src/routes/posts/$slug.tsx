@@ -3,56 +3,36 @@ import { Button } from '@/components/ui/button'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery } from 'convex/react'
 import { ChevronRight, MessageCircle, Trash2 } from 'lucide-react'
+import { useMemo } from 'react'
 import Markdown from 'react-markdown'
-import { Comment, type CommentData } from './-components/Comment'
 import { api } from '../../../convex/_generated/api'
+import { Comment, type CommentData } from './-components/Comment'
 
 export const Route = createFileRoute('/posts/$slug')({
   component: RouteComponent,
 })
-
-// Stubbed comments for now
-const STUBBED_COMMENTS: CommentData[] = [
-  {
-    id: '1',
-    author: {
-      name: 'Luna Starweaver',
-      avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Luna',
-    },
-    content:
-      'This really resonates with me. I love how you articulated your thoughts here — it feels authentic and vulnerable. Keep writing!',
-    upvotes: 12,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-  },
-  {
-    id: '2',
-    author: {
-      name: 'Sage Mindwell',
-      avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Sage',
-    },
-    content:
-      "What a beautiful perspective. I hadn't thought about it this way before. Your writing always gives me something to reflect on.",
-    upvotes: 8,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-  },
-  {
-    id: '3',
-    author: {
-      name: 'River Thoughtstream',
-      avatarUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=River',
-    },
-    content:
-      'I appreciate you sharing this. Writing can be such a powerful way to process our experiences.',
-    upvotes: 5,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
-  },
-]
 
 function RouteComponent() {
   const { slug } = Route.useParams()
   const navigate = useNavigate()
   const post = useQuery(api.posts.getBySlug, { slug })
   const deletePost = useMutation(api.posts.remove)
+
+  const comments: CommentData[] = useMemo(() => {
+    if (!post?.comments) return []
+    return post.comments
+      .filter((comment) => comment.author !== null)
+      .map((comment) => ({
+        id: comment._id,
+        author: {
+          name: comment.author!.name,
+          avatarUrl: comment.author!.avatarUrl,
+        },
+        content: comment.content,
+        upvotes: comment.upvotes,
+        createdAt: new Date(comment._creationTime),
+      }))
+  }, [post?.comments])
 
   const handleDelete = async () => {
     if (!post) return
@@ -105,15 +85,26 @@ function RouteComponent() {
         <div className="flex items-center gap-2 mb-6">
           <MessageCircle className="size-5 text-muted-foreground" />
           <h2 className="text-lg font-semibold">Thoughts from your readers</h2>
-          <span className="text-sm text-muted-foreground">
-            ({STUBBED_COMMENTS.length})
-          </span>
+          {comments.length > 0 && (
+            <span className="text-sm text-muted-foreground">
+              ({comments.length})
+            </span>
+          )}
         </div>
-        <div className="space-y-0">
-          {STUBBED_COMMENTS.map((comment) => (
-            <Comment key={comment.id} comment={comment} />
-          ))}
-        </div>
+        {comments.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No comments yet.</p>
+            <p className="text-sm mt-1">
+              Your readers will share their thoughts soon!
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-0">
+            {comments.map((comment) => (
+              <Comment key={comment.id} comment={comment} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   )
