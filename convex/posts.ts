@@ -1,6 +1,8 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
 import { zid } from 'convex-helpers/server/zod4'
 import { z } from 'zod'
+import { MINUTE, SECOND } from '../src/lib/time'
+import { internal } from './_generated/api'
 import { query } from './_generated/server'
 import { zMutation, zQuery } from './zodConvex'
 
@@ -171,6 +173,28 @@ export const publish = zMutation({
     if (post.publishedAt !== null) {
       throw new Error('Post already published')
     }
+
+    const agents = await ctx.db.query('agents').collect()
+
+    await Promise.all(
+      agents.map(async (agent) => {
+        const DEV_INSTANT_FLAG = true
+        const isInstant = DEV_INSTANT_FLAG && process.env.IS_DEBUG === 'true'
+
+        const minWaitMs = 5 * SECOND
+        const maxWaitMs = 10 * MINUTE
+        const waitMs =
+          Math.floor(Math.random() * (maxWaitMs - minWaitMs + 1)) + minWaitMs
+        await ctx.scheduler.runAfter(
+          isInstant ? 0 : waitMs,
+          internal.agents.comment,
+          {
+            postId: args.id,
+            agentId: agent._id,
+          },
+        )
+      }),
+    )
 
     return await ctx.db.patch(args.id, {
       publishedAt: Date.now(),

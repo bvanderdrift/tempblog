@@ -30,7 +30,6 @@ const agentFormSchema = z.object({
   avatarUrl: z.string().url('Must be a valid URL'),
   personality: z.string().min(1, 'Personality is required'),
   backstory: z.string().min(1, 'Backstory is required'),
-  instructions: z.string().min(1, 'Instructions are required'),
 })
 
 type AgentFormData = z.infer<typeof agentFormSchema>
@@ -42,7 +41,6 @@ type Agent = {
   avatarUrl: string
   personality: string
   backstory: string
-  instructions: string
 }
 
 function AgentsAdmin() {
@@ -161,12 +159,6 @@ function AgentsAdmin() {
                   </span>
                   <p className="mt-1 line-clamp-2">{agent.backstory}</p>
                 </div>
-                <div>
-                  <span className="font-medium text-muted-foreground">
-                    Instructions:
-                  </span>
-                  <p className="mt-1 line-clamp-2">{agent.instructions}</p>
-                </div>
               </div>
             </div>
           ))}
@@ -205,7 +197,6 @@ function AgentDialog({ open, onOpenChange, agent, onSave }: AgentDialogProps) {
       avatarUrl: '',
       personality: '',
       backstory: '',
-      instructions: '',
     },
   })
 
@@ -217,7 +208,6 @@ function AgentDialog({ open, onOpenChange, agent, onSave }: AgentDialogProps) {
           avatarUrl: agent.avatarUrl,
           personality: agent.personality,
           backstory: agent.backstory,
-          instructions: agent.instructions,
         })
       } else {
         reset({
@@ -225,7 +215,6 @@ function AgentDialog({ open, onOpenChange, agent, onSave }: AgentDialogProps) {
           avatarUrl: '',
           personality: '',
           backstory: '',
-          instructions: '',
         })
       }
     }
@@ -322,26 +311,6 @@ function AgentDialog({ open, onOpenChange, agent, onSave }: AgentDialogProps) {
             <p className="text-xs text-muted-foreground">
               Their fictional background. E.g., "A retired librarian who loves
               hearing people's stories"
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="instructions">Instructions</Label>
-            <Textarea
-              id="instructions"
-              placeholder="Specific instructions for how the agent should respond to posts..."
-              rows={4}
-              {...register('instructions')}
-              aria-invalid={!!errors.instructions}
-            />
-            {errors.instructions && (
-              <p className="text-sm text-destructive">
-                {errors.instructions.message}
-              </p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              System-level guidance. E.g., "Always acknowledge the writer's
-              feelings before offering perspective"
             </p>
           </div>
 
