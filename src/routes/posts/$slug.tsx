@@ -110,10 +110,27 @@ function RouteComponent() {
         </div>
         {comments.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
-            <p>No comments yet.</p>
-            <p className="text-sm mt-1">
-              Your readers will share their thoughts soon!
-            </p>
+            {post.publishedAt === null ? (
+              <>
+                <p>Publish your post to start receiving comments.</p>
+                <p className="text-sm mt-1 mb-4">
+                  Your AI readers are eager to share their thoughts!
+                </p>
+                <ConfirmPublishDialog onConfirm={handlePublish}>
+                  <Button>
+                    <Send className="size-4 mr-1" />
+                    Publish
+                  </Button>
+                </ConfirmPublishDialog>
+              </>
+            ) : (
+              <>
+                <p>No comments yet.</p>
+                <p className="text-sm mt-1">
+                  Your readers will share their thoughts soon!
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <div className="space-y-0">
