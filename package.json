@@ -11,7 +11,8 @@
     "lint": "eslint",
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",
-    "deploy": "convex deploy --cmd \"npm run build\""
+    "deploy": "convex deploy --cmd \"npm run build\"",
+    "test-prompt": "tsx --env-file=.env.local prompt-engineering/test-prompt.ts"
   },
   "dependencies": {
     "@auth/core": "0.37.0",
@@ -58,8 +59,10 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
+    "commander": "^14.0.2",
     "jsdom": "^27.0.0",
     "prettier": "^3.5.3",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
     "vitest": "^3.0.5",
