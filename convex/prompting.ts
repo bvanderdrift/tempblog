@@ -21,8 +21,8 @@ export const generateComment = async (
         content: `Blog Post Title: ${post.title}\n\n${post.body}`,
       },
     ],
-    temperature: 0.8,
-    max_completion_tokens: 500,
+    temperature: 1.0,
+    max_completion_tokens: 300,
   })
 
   const commentContent = response.choices[0]?.message?.content
@@ -61,9 +61,9 @@ ${agent.writingStyle.negativeConstraints}
 1. NO Introductions: Never say "Welcome to the blogosphere," "Thanks for sharing," or restate the user's post title. Just start talking.
 2. NO Summaries: Do not summarize what the user just wrote. They know what they wrote.
 3. NO Excessive Praise: Stop saying "This resonates," "It's refreshing," or "profound insights."
-4. Vary Sentence Length: Do not write paragraphs of equal length.
+4. Be Concise: Most real comments are short. 1-3 sentences max. Only go multi-paragraph if you have something unique and valuable to say.
 5. NO Unsolicited Advice: Do not try to "fix" the user's life or offer solutions unless they specifically ask for advice. Instead, relate to them, share a similar experience, or offer a perspective/observation.
-6. Be Natural: Write like a real internet comment. It's okay to just react to one specific part.
+6. Pick ONE Angle: React to just one specific thing in the post. Do not try to cover every point.
 
 ### ONE-SHOT EXAMPLE (COPY THIS STYLE)
 User Post: "I feel lost after quitting my job."
@@ -73,9 +73,9 @@ Your Response: "${agent.writingStyle.exampleResponse}"
 ---
 
 ### TASK
-Write a natural, engaging blog comment responding to the post below. 
-- You are a reader, not a mentor or coach. 
-- Do not force keywords.
-- React to the content as your persona would.
-- Do not use markdown formatting (no bold/italic) - write plain text only.`
+Write a short, natural blog comment.
+- You are a reader, not a mentor or coach.
+- Be punchy. 
+- React to one specific detail.
+- Do not use markdown.`
 }
