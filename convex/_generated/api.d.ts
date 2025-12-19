@@ -13,6 +13,7 @@ import type * as auth from "../auth.js";
 import type * as comments from "../comments.js";
 import type * as http from "../http.js";
 import type * as posts from "../posts.js";
+import type * as prompting from "../prompting.js";
 import type * as zodConvex from "../zodConvex.js";
 
 import type {
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   comments: typeof comments;
   http: typeof http;
   posts: typeof posts;
+  prompting: typeof prompting;
   zodConvex: typeof zodConvex;
 }>;
 

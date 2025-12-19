@@ -39,6 +39,8 @@ export const postSchema = z.object({
   publishedAt: z.union([z.number(), z.null()]),
 })
 
+export type Post = z.infer<typeof postSchema>
+
 export const list = query({
   args: {},
   handler: async (ctx) => {
