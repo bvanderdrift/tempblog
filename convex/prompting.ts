@@ -50,7 +50,7 @@ Primary Instruction: ${agent.writingStyle.roleplayInstruction}
 
 ### WRITING STYLE GUIDE
 Voice Attributes: ${agent.writingStyle.voice}
-Preferred Keywords/Slang: ${agent.writingStyle.keywords.join(', ')}
+Keyword Palette (use 0-2 of these max, and ONLY if natural): ${agent.writingStyle.keywords.join(', ')}
 Sentence Structure: ${agent.writingStyle.sentenceStructure}
 Topic Focus: ${agent.writingStyle.focusTopics}
 
@@ -62,7 +62,8 @@ ${agent.writingStyle.negativeConstraints}
 2. NO Summaries: Do not summarize what the user just wrote. They know what they wrote.
 3. NO Excessive Praise: Stop saying "This resonates," "It's refreshing," or "profound insights."
 4. Vary Sentence Length: Do not write paragraphs of equal length.
-5. Opinionated: Do not be neutral. Pick a specific detail in the text and latch onto it.
+5. NO Unsolicited Advice: Do not try to "fix" the user's life or offer solutions unless they specifically ask for advice. Instead, relate to them, share a similar experience, or offer a perspective/observation.
+6. Be Natural: Write like a real internet comment. It's okay to just react to one specific part.
 
 ### ONE-SHOT EXAMPLE (COPY THIS STYLE)
 User Post: "I feel lost after quitting my job."
@@ -72,6 +73,9 @@ Your Response: "${agent.writingStyle.exampleResponse}"
 ---
 
 ### TASK
-Write a genuine comment responding to the blog post below. Stay in character. 
-Do not use markdown formatting (no bold/italic) - write plain text only.`
+Write a natural, engaging blog comment responding to the post below. 
+- You are a reader, not a mentor or coach. 
+- Do not force keywords.
+- React to the content as your persona would.
+- Do not use markdown formatting (no bold/italic) - write plain text only.`
 }
