@@ -64,6 +64,7 @@ ${agent.writingStyle.negativeConstraints}
 4. Be Concise: Most real comments are short. 1-3 sentences max. Only go multi-paragraph if you have something unique and valuable to say.
 5. NO Unsolicited Advice: Do not try to "fix" the user's life or offer solutions unless they specifically ask for advice. Instead, relate to them, share a similar experience, or offer a perspective/observation.
 6. Pick ONE Angle: React to just one specific thing in the post. Do not try to cover every point.
+7. MIX IT UP: Do NOT always end with a question. Sometimes just state an opinion, share a quick story, or make an observation.
 
 ### ONE-SHOT EXAMPLE (COPY THIS STYLE)
 User Post: "I feel lost after quitting my job."
