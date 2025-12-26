@@ -1,7 +1,3 @@
-import { Button } from '@/components/ui/button'
-import { ChevronUp } from 'lucide-react'
-import { useState } from 'react'
-
 export interface CommentData {
   id: string
   author: {
@@ -18,18 +14,18 @@ interface CommentProps {
 }
 
 export function Comment({ comment }: CommentProps) {
-  const [upvotes, setUpvotes] = useState(comment.upvotes)
-  const [hasUpvoted, setHasUpvoted] = useState(false)
+  //   const [upvotes, setUpvotes] = useState(comment.upvotes)
+  //   const [hasUpvoted, setHasUpvoted] = useState(false)
 
-  const handleUpvote = () => {
-    if (hasUpvoted) {
-      setUpvotes((prev) => prev - 1)
-      setHasUpvoted(false)
-    } else {
-      setUpvotes((prev) => prev + 1)
-      setHasUpvoted(true)
-    }
-  }
+  //   const handleUpvote = () => {
+  //     if (hasUpvoted) {
+  //       setUpvotes((prev) => prev - 1)
+  //       setHasUpvoted(false)
+  //     } else {
+  //       setUpvotes((prev) => prev + 1)
+  //       setHasUpvoted(true)
+  //     }
+  //   }
 
   const authorName = comment.author?.name ?? 'Deleted account'
   const authorAvatar = comment.author?.avatarUrl
@@ -49,7 +45,9 @@ export function Comment({ comment }: CommentProps) {
       )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <span className={`font-medium ${comment.author ? 'text-foreground' : 'text-muted-foreground italic'}`}>
+          <span
+            className={`font-medium ${comment.author ? 'text-foreground' : 'text-muted-foreground italic'}`}
+          >
             {authorName}
           </span>
           <span className="text-xs text-muted-foreground">
@@ -59,7 +57,7 @@ export function Comment({ comment }: CommentProps) {
         <p className="text-sm text-foreground/90 whitespace-pre-wrap mb-2">
           {comment.content}
         </p>
-        <div className="flex items-center gap-1">
+        {/* <div className="flex items-center gap-1">
           <Button
             variant={hasUpvoted ? 'secondary' : 'ghost'}
             size="sm"
@@ -71,7 +69,7 @@ export function Comment({ comment }: CommentProps) {
             />
             <span className="text-xs font-medium tabular-nums">{upvotes}</span>
           </Button>
-        </div>
+        </div> */}
       </div>
     </article>
   )
@@ -90,4 +88,3 @@ function formatRelativeTime(date: Date): string {
   if (diffDays < 7) return `${diffDays}d ago`
   return date.toLocaleDateString()
 }
-
