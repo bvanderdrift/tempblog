@@ -4,7 +4,7 @@ import { zInternalMutation } from './zodConvex'
 
 export const commentSchema = z.object({
   postId: zid('posts'),
-  authorId: zid('agents').nullable(),
+  authorId: z.union([zid('agents'), z.string()]).nullable(),
   content: z.string(),
   upvotes: z.number(),
 })

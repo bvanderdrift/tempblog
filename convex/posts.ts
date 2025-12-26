@@ -1,6 +1,7 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
 import { zid } from 'convex-helpers/server/zod4'
 import { z } from 'zod'
+import { agents } from '../prompt-engineering/agents'
 import { MINUTE, SECOND } from '../src/lib/time'
 import { internal } from './_generated/api'
 import { Id } from './_generated/dataModel'
@@ -21,8 +22,6 @@ const WAIT_MS = IS_INSTANT
   : Math.floor(Math.random() * (WAIT_MS_MAX - WAIT_MS_MIN + 1)) + WAIT_MS_MIN
 
 async function scheduleAgentComments(ctx: MutationCtx, postId: Id<'posts'>) {
-  const agents = await ctx.db.query('agents').collect()
-
   await Promise.all(
     agents.map(async (agent) => {
       await ctx.scheduler.runAfter(WAIT_MS, internal.agents.comment, {
@@ -91,9 +90,21 @@ export const getBySlug = zQuery({
     // Fetch agent data for each comment
     const commentsWithAuthors = await Promise.all(
       comments.map(async (comment) => {
+        const hardcodedAuthor = agents.find(
+          (agent) => agent._id === comment.authorId,
+        )
+
+        if (hardcodedAuthor) {
+          return {
+            ...comment,
+            author: hardcodedAuthor,
+          }
+        }
+
         const author = comment.authorId
-          ? await ctx.db.get(comment.authorId)
+          ? await ctx.db.get(comment.authorId as Id<'agents'>)
           : null
+
         return {
           ...comment,
           author,

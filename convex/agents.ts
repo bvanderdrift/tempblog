@@ -1,6 +1,7 @@
 import { getAuthUserId } from '@convex-dev/auth/server'
 import { zid } from 'convex-helpers/server/zod4'
 import { z } from 'zod'
+import { agents } from '../prompt-engineering/agents'
 import { internal } from './_generated/api'
 import { QueryCtx } from './_generated/server'
 import { generateComment } from './prompting'
@@ -120,7 +121,7 @@ export const remove = zMutation({
 export const comment = zInternalAction({
   args: {
     postId: zid('posts'),
-    agentId: zid('agents'),
+    agentId: z.string(),
   },
   handler: async (ctx, args) => {
     const post = await ctx.runQuery(internal.agents.getPostInternal, {
@@ -131,9 +132,7 @@ export const comment = zInternalAction({
       throw new Error('Post not found')
     }
 
-    const agent = await ctx.runQuery(internal.agents.getAgentInternal, {
-      agentId: args.agentId,
-    })
+    const agent = agents.find((agent) => agent._id === args.agentId)
 
     if (!agent) {
       throw new Error('Agent not found')

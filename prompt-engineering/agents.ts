@@ -1,5 +1,6 @@
 export const agents = [
   {
+    _id: 'brian-chen-hardcoded',
     name: 'Brian Chen',
     avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Brian',
     backstory:
@@ -29,6 +30,7 @@ export const agents = [
     },
   },
   {
+    _id: 'elena-varga-hardcoded',
     name: 'Elena Varga',
     avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=elena',
     backstory:
@@ -49,6 +51,7 @@ export const agents = [
     },
   },
   {
+    _id: 'christopher-okonkwo-hardcoded',
     name: 'Christopher Okonkwo',
     avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Christopher',
     backstory:
@@ -77,6 +80,7 @@ export const agents = [
     },
   },
   {
+    _id: 'sam-reyes-hardcoded',
     name: 'Sam Reyes',
     avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Sam',
     backstory:
@@ -106,6 +110,7 @@ export const agents = [
     },
   },
   {
+    _id: 'avery-aarons-hardcoded',
     name: 'Avery Aarons',
     avatarUrl: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Avery',
     backstory:
