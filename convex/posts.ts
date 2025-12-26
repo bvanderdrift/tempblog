@@ -7,26 +7,28 @@ import { Id } from './_generated/dataModel'
 import { MutationCtx, query } from './_generated/server'
 import { zMutation, zQuery } from './zodConvex'
 
+const DEV_INSTANT_FLAG = true
+const ALWAYS_INSTANT_FLAG = true
+
+const IS_INSTANT =
+  ALWAYS_INSTANT_FLAG || (DEV_INSTANT_FLAG && process.env.IS_DEBUG === 'true')
+
+const WAIT_MS_MIN = 5 * SECOND
+const WAIT_MS_MAX = 10 * MINUTE
+
+const WAIT_MS = IS_INSTANT
+  ? 0
+  : Math.floor(Math.random() * (WAIT_MS_MAX - WAIT_MS_MIN + 1)) + WAIT_MS_MIN
+
 async function scheduleAgentComments(ctx: MutationCtx, postId: Id<'posts'>) {
   const agents = await ctx.db.query('agents').collect()
 
   await Promise.all(
     agents.map(async (agent) => {
-      const DEV_INSTANT_FLAG = true
-      const isInstant = DEV_INSTANT_FLAG && process.env.IS_DEBUG === 'true'
-
-      const minWaitMs = 5 * SECOND
-      const maxWaitMs = 10 * MINUTE
-      const waitMs =
-        Math.floor(Math.random() * (maxWaitMs - minWaitMs + 1)) + minWaitMs
-      await ctx.scheduler.runAfter(
-        isInstant ? 0 : waitMs,
-        internal.agents.comment,
-        {
-          postId,
-          agentId: agent._id,
-        },
-      )
+      await ctx.scheduler.runAfter(WAIT_MS, internal.agents.comment, {
+        postId,
+        agentId: agent._id,
+      })
     }),
   )
 }
