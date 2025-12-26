@@ -51,7 +51,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-8">
+    <div className="w-full max-w-2xl mx-auto p-8">
       <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
         <Link to="/" className="hover:text-foreground transition-colors">
           Posts

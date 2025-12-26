@@ -14,14 +14,14 @@ export function LoginView() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/20 relative overflow-hidden">
+    <div className="relative overflow-hidden flex-1 flex items-center justify-center">
       {/* Subtle decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12">
+      <div className="relative z-10 flex flex-col items-center justify-center px-6 py-12">
         {/* Hero Content */}
         <div className="max-w-2xl text-center space-y-8">
           {/* Logo/Brand mark */}

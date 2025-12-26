@@ -1,9 +1,9 @@
 import { ConfirmPublishDialog } from '@/components/ConfirmPublishDialog'
 import { Button } from '@/components/ui/button'
 import { useMutation } from '@tanstack/react-query'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useMutation as useConvexMutation } from 'convex/react'
-import { Loader2 } from 'lucide-react'
+import { ChevronRight, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { api } from '../../../convex/_generated/api'
 
@@ -41,8 +41,14 @@ function RouteComponent() {
   const isFormValid = title.trim() && body.trim()
 
   return (
-    <div className="max-w-2xl mx-auto p-8">
-      <h1 className="text-2xl font-bold mb-6">New Post</h1>
+    <div className="w-full max-w-2xl mx-auto p-8">
+      <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
+        <Link to="/" className="hover:text-foreground transition-colors">
+          Posts
+        </Link>
+        <ChevronRight className="size-4" />
+        <span className="text-foreground">New Post</span>
+      </nav>
       <form
         onSubmit={(e) => {
           e.preventDefault()
