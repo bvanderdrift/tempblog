@@ -20,10 +20,12 @@ Just run `pnpm install`, should install all dependencies
 
 ### Initialize `convex`
 
-**If you have an account & project w/ [Convex](https://www.convex.dev/) already**
+**If you have an account & project w/ [Convex](https://www.convex.dev/) already**:
+
 `npx convex dev --once`
 
-**Local Environment**:
+**Local Environment** (no account needed):
+
 `npx convex dev --local --once`
 
 ### Set GitHub Auth
