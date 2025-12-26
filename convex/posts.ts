@@ -10,6 +10,7 @@ import { zMutation, zQuery } from './zodConvex'
 
 const DEV_INSTANT_FLAG = true
 const ALWAYS_INSTANT_FLAG = true
+const INSTANT_INTERVAL = 2 * SECOND
 
 const IS_INSTANT =
   ALWAYS_INSTANT_FLAG || (DEV_INSTANT_FLAG && process.env.IS_DEBUG === 'true')
@@ -23,11 +24,15 @@ const WAIT_MS = IS_INSTANT
 
 async function scheduleAgentComments(ctx: MutationCtx, postId: Id<'posts'>) {
   await Promise.all(
-    agents.map(async (agent) => {
-      await ctx.scheduler.runAfter(WAIT_MS, internal.agents.comment, {
-        postId,
-        agentId: agent._id,
-      })
+    agents.map(async (agent, index) => {
+      await ctx.scheduler.runAfter(
+        IS_INSTANT ? INSTANT_INTERVAL * index + 1 : WAIT_MS,
+        internal.agents.comment,
+        {
+          postId,
+          agentId: agent._id,
+        },
+      )
     }),
   )
 }
