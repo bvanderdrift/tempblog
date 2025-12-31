@@ -78,7 +78,7 @@ function RouteComponent() {
             id="body"
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            className="w-full border rounded-md px-3 py-2 min-h-[200px]"
+            className="w-full border rounded-md px-3 py-2 min-h-[400px]"
             placeholder="Write your post..."
             required
           />
