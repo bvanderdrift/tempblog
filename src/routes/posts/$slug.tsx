@@ -126,6 +126,7 @@ function RouteComponent() {
         <ChevronRight className="size-4" />
         <span className="text-foreground">{post.title}</span>
       </nav>
+
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold mb-2">{post.title}</h1>
@@ -158,9 +159,22 @@ function RouteComponent() {
           )}
         </div>
       </div>
+
       <div className="prose prose-neural dark:prose-invert">
         <Markdown>{post.body}</Markdown>
       </div>
+
+      {post.publishedAt === null && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleEdit}
+          className="mt-6"
+        >
+          <Pencil className="size-4 mr-1" />
+          Edit
+        </Button>
+      )}
 
       {/* Comments Section */}
       <section className="mt-12 pt-8 border-t border-border">
