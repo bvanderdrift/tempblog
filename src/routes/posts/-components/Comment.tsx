@@ -1,6 +1,8 @@
 export interface CommentData {
   id: string
+  parentCommentId: string | null
   author: {
+    _id: string
     name: string
     avatarUrl: string
   } | null
@@ -11,33 +13,28 @@ export interface CommentData {
 
 interface CommentProps {
   comment: CommentData
+  isInThread?: boolean
 }
 
-export function Comment({ comment }: CommentProps) {
-  //   const [upvotes, setUpvotes] = useState(comment.upvotes)
-  //   const [hasUpvoted, setHasUpvoted] = useState(false)
-
-  //   const handleUpvote = () => {
-  //     if (hasUpvoted) {
-  //       setUpvotes((prev) => prev - 1)
-  //       setHasUpvoted(false)
-  //     } else {
-  //       setUpvotes((prev) => prev + 1)
-  //       setHasUpvoted(true)
-  //     }
-  //   }
-
-  const authorName = comment.author?.name ?? 'Deleted account'
+export function Comment({ comment, isInThread = false }: CommentProps) {
+  const authorName = comment.author?.name ?? 'You'
   const authorAvatar = comment.author?.avatarUrl
 
+  // Check if this comment is from the user (not an agent)
+  const isUserComment = comment.author === null
+
   return (
-    <article className="flex gap-3 py-4 border-b border-border last:border-b-0">
+    <article className={`flex gap-3 py-4 ${!isInThread ? '' : 'border-b-0'}`}>
       {authorAvatar ? (
         <img
           src={authorAvatar}
           alt={`${authorName}'s avatar`}
           className="size-10 rounded-full object-cover shrink-0 ring-2 ring-muted"
         />
+      ) : isUserComment ? (
+        <div className="size-10 rounded-full bg-primary/10 shrink-0 ring-2 ring-primary/20 flex items-center justify-center text-primary text-sm font-medium">
+          You
+        </div>
       ) : (
         <div className="size-10 rounded-full bg-muted shrink-0 ring-2 ring-muted flex items-center justify-center text-muted-foreground text-sm font-medium">
           ?
@@ -46,7 +43,13 @@ export function Comment({ comment }: CommentProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span
-            className={`font-medium ${comment.author ? 'text-foreground' : 'text-muted-foreground italic'}`}
+            className={`font-medium ${
+              isUserComment
+                ? 'text-primary'
+                : comment.author
+                  ? 'text-foreground'
+                  : 'text-muted-foreground italic'
+            }`}
           >
             {authorName}
           </span>
@@ -54,22 +57,9 @@ export function Comment({ comment }: CommentProps) {
             {formatRelativeTime(comment.createdAt)}
           </span>
         </div>
-        <p className="text-sm text-foreground/90 whitespace-pre-wrap mb-2">
+        <p className="text-sm text-foreground/90 whitespace-pre-wrap">
           {comment.content}
         </p>
-        {/* <div className="flex items-center gap-1">
-          <Button
-            variant={hasUpvoted ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={handleUpvote}
-            className={`h-7 px-2 gap-1 ${hasUpvoted ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            <ChevronUp
-              className={`size-4 transition-transform ${hasUpvoted ? 'scale-110' : ''}`}
-            />
-            <span className="text-xs font-medium tabular-nums">{upvotes}</span>
-          </Button>
-        </div> */}
       </div>
     </article>
   )

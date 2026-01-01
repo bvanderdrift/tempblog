@@ -11,7 +11,8 @@ import { useMemo } from 'react'
 import Markdown from 'react-markdown'
 import z from 'zod'
 import { api } from '../../../convex/_generated/api'
-import { Comment, type CommentData } from './-components/Comment'
+import { type CommentData } from './-components/Comment'
+import { CommentThread } from './-components/CommentThread'
 import { PostForm, slugify } from './-components/PostForm'
 
 export const Route = createFileRoute('/posts/$slug')({
@@ -40,12 +41,50 @@ function RouteComponent() {
     if (!post?.comments) return []
     return post.comments.map((comment) => ({
       id: comment._id,
+      parentCommentId: comment.parentCommentId ?? null,
       author: comment.author,
       content: comment.content,
       upvotes: comment.upvotes,
       createdAt: new Date(comment._creationTime),
     }))
   }, [post?.comments])
+
+  // Organize comments into threads (root comments + their replies)
+  const threads = useMemo(() => {
+    // Get root comments (no parent)
+    const rootComments = comments.filter((c) => c.parentCommentId === null)
+
+    // Build a map of parent -> children
+    const childrenMap = new Map<string, CommentData[]>()
+    for (const comment of comments) {
+      if (comment.parentCommentId) {
+        const existing = childrenMap.get(comment.parentCommentId) ?? []
+        existing.push(comment)
+        childrenMap.set(comment.parentCommentId, existing)
+      }
+    }
+
+    // For each root comment, build the thread (flatten into conversation order)
+    return rootComments.map((root) => {
+      const thread: CommentData[] = [root]
+
+      // Walk down the thread following replies
+      let current = root
+      while (true) {
+        const children = childrenMap.get(current.id)
+        if (!children || children.length === 0) break
+        // Sort children by creation time and take the thread
+        const sortedChildren = children.sort(
+          (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+        )
+        thread.push(...sortedChildren)
+        // Continue from the last child to find further replies
+        current = sortedChildren[sortedChildren.length - 1]
+      }
+
+      return thread
+    })
+  }, [comments])
 
   const handleDelete = async () => {
     if (!post) return
@@ -210,7 +249,7 @@ function RouteComponent() {
             </span>
           )}
         </div>
-        {comments.length === 0 ? (
+        {threads.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             {post.publishedAt === null ? (
               <>
@@ -236,8 +275,8 @@ function RouteComponent() {
           </div>
         ) : (
           <div className="space-y-0">
-            {comments.map((comment) => (
-              <Comment key={comment.id} comment={comment} />
+            {threads.map((thread) => (
+              <CommentThread key={thread[0].id} thread={thread} />
             ))}
           </div>
         )}

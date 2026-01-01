@@ -6,7 +6,7 @@ import { MINUTE, SECOND } from '../src/lib/time'
 import { internal } from './_generated/api'
 import { Id } from './_generated/dataModel'
 import { MutationCtx, query } from './_generated/server'
-import { zMutation, zQuery } from './zodConvex'
+import { zInternalQuery, zMutation, zQuery } from './zodConvex'
 
 const DEV_INSTANT_FLAG = true
 const ALWAYS_INSTANT_FLAG = true
@@ -121,6 +121,13 @@ export const getBySlug = zQuery({
       ...post,
       comments: commentsWithAuthors,
     }
+  },
+})
+
+export const get = zInternalQuery({
+  args: { postId: zid('posts') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.postId)
   },
 })
 

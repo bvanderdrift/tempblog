@@ -21,6 +21,7 @@ export const agentSchema = z.object({
       focusTopics: z.string(),
       negativeConstraints: z.string(),
       exampleResponse: z.string(),
+      exampleReplyResponse: z.string(),
     })
     .optional(),
 })
@@ -124,7 +125,7 @@ export const comment = zInternalAction({
     agentId: z.string(),
   },
   handler: async (ctx, args) => {
-    const post = await ctx.runQuery(internal.agents.getPostInternal, {
+    const post = await ctx.runQuery(internal.posts.get, {
       postId: args.postId,
     })
 
@@ -146,13 +147,6 @@ export const comment = zInternalAction({
       content: commentContent,
       upvotes: 0,
     })
-  },
-})
-
-export const getPostInternal = zInternalQuery({
-  args: { postId: zid('posts') },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.postId)
   },
 })
 
