@@ -1,7 +1,7 @@
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog'
 import { ConfirmPublishDialog } from '@/components/ConfirmPublishDialog'
 import { Button } from '@/components/ui/button'
-import { MINUTE, SECOND } from '@/lib/time'
+import { MINUTE } from '@/lib/time'
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -88,6 +88,10 @@ function RouteComponent() {
       body: data.body,
       slug: newSlug,
     })
+
+    if (data.publishedAt) {
+      await publishPost({ id: post._id })
+    }
 
     if (data.isAutoSave) return
 
