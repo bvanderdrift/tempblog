@@ -17,11 +17,8 @@ interface CommentProps {
 }
 
 export function Comment({ comment, isInThread = false }: CommentProps) {
-  const authorName = comment.author?.name ?? 'You'
+  const authorName = comment.author?.name ?? 'Deleted account'
   const authorAvatar = comment.author?.avatarUrl
-
-  // Check if this comment is from the user (not an agent)
-  const isUserComment = comment.author === null
 
   return (
     <article className={`flex gap-3 py-4 ${!isInThread ? '' : 'border-b-0'}`}>
@@ -31,10 +28,6 @@ export function Comment({ comment, isInThread = false }: CommentProps) {
           alt={`${authorName}'s avatar`}
           className="size-10 rounded-full object-cover shrink-0 ring-2 ring-muted"
         />
-      ) : isUserComment ? (
-        <div className="size-10 rounded-full bg-primary/10 shrink-0 ring-2 ring-primary/20 flex items-center justify-center text-primary text-sm font-medium">
-          You
-        </div>
       ) : (
         <div className="size-10 rounded-full bg-muted shrink-0 ring-2 ring-muted flex items-center justify-center text-muted-foreground text-sm font-medium">
           ?
@@ -44,11 +37,9 @@ export function Comment({ comment, isInThread = false }: CommentProps) {
         <div className="flex items-center gap-2 mb-1">
           <span
             className={`font-medium ${
-              isUserComment
-                ? 'text-primary'
-                : comment.author
-                  ? 'text-foreground'
-                  : 'text-muted-foreground italic'
+              comment.author
+                ? 'text-foreground'
+                : 'text-muted-foreground italic'
             }`}
           >
             {authorName}

@@ -14,18 +14,41 @@ import {
 export const commentSchema = z.object({
   postId: zid('posts'),
   parentCommentId: zid('comments').nullable().optional(),
-  authorId: z.union([zid('agents'), z.string()]).nullable(),
+  /** @deprecated use author instead */
+  authorId: z
+    .union([zid('agents'), zid('users'), z.string()])
+    .nullable()
+    .optional(),
+  author: z
+    .union([
+      z.object({
+        type: z.literal('agent'),
+        id: zid('agents'),
+      }),
+      z.object({
+        type: z.literal('user'),
+        id: zid('users'),
+      }),
+      z.object({
+        type: z.literal('hardcoded-agent'),
+        id: z.string(),
+      }),
+    ])
+    .nullable()
+    .optional(),
   content: z.string(),
   upvotes: z.number(),
 })
 
+export type Comment = z.infer<typeof commentSchema>
+
 export const create = zInternalMutation({
-  args: commentSchema,
+  args: commentSchema.omit({ authorId: true }),
   handler: async (ctx, args) => {
     return await ctx.db.insert('comments', {
       postId: args.postId,
       parentCommentId: args.parentCommentId ?? null,
-      authorId: args.authorId,
+      author: args.author ?? null,
       content: args.content,
       upvotes: args.upvotes,
     })
@@ -80,7 +103,7 @@ export const replyToCommentAsAgent = zInternalAction({
     await ctx.runMutation(internal.comments.create, {
       postId: userComment.postId,
       parentCommentId: args.userCommentId,
-      authorId: args.agentId,
+      author: { type: 'hardcoded-agent', id: args.agentId },
       content: replyContent,
       upvotes: 0,
     })
@@ -121,18 +144,25 @@ export const replyToCommentAsUser = zMutation({
     const replyId = await ctx.db.insert('comments', {
       postId: parentComment.postId,
       parentCommentId: args.parentCommentId,
-      authorId: currentUserId,
+      author: { type: 'user', id: currentUserId },
       content: args.content,
       upvotes: 0,
     })
 
-    if (!parentComment.authorId) {
+    // Determine if parent is from an agent (new author field or legacy authorId)
+    const parentAuthor = parentComment.author
+    const legacyAuthorId = parentComment.authorId
+
+    const agentId = parentAuthor?.id ?? legacyAuthorId ?? null
+
+    if (!agentId) {
       return replyId
     }
+
     // Schedule agent to reply to user's comment
     await ctx.scheduler.runAfter(0, internal.comments.replyToCommentAsAgent, {
       userCommentId: replyId,
-      agentId: parentComment.authorId,
+      agentId,
     })
 
     return replyId

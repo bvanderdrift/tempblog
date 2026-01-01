@@ -5,7 +5,8 @@ import { agents } from '../prompt-engineering/agents'
 import { MINUTE, SECOND } from '../src/lib/time'
 import { internal } from './_generated/api'
 import { Id } from './_generated/dataModel'
-import { MutationCtx, query } from './_generated/server'
+import { MutationCtx, query, QueryCtx } from './_generated/server'
+import { Comment } from './comments'
 import { zInternalQuery, zMutation, zQuery } from './zodConvex'
 
 const DEV_INSTANT_FLAG = true
@@ -46,6 +47,71 @@ export const postSchema = z.object({
 })
 
 export type Post = z.infer<typeof postSchema>
+
+export const fetchAuthor = async (
+  ctx: QueryCtx,
+  comment: Pick<Comment, 'author' | 'authorId'>,
+): Promise<{
+  _id: string
+  name: string
+  avatarUrl: string | null
+} | null> => {
+  if (comment.author) {
+    if (comment.author.type === 'hardcoded-agent') {
+      const id = comment.author.id
+      return agents.find((agent) => agent._id === id) ?? null
+    }
+
+    if (comment.author.type === 'agent') {
+      return await ctx.db.get(comment.author.id)
+    }
+
+    if (comment.author.type === 'user') {
+      const user = await ctx.db.get(comment.author.id)
+
+      if (!user) {
+        return null
+      }
+
+      return {
+        _id: user._id,
+        name: user.name ?? 'Unknown user',
+        avatarUrl: user.image ?? null,
+      }
+    }
+  }
+
+  if (!comment.authorId) {
+    return null
+  }
+
+  const hardcodedAgent = agents.find((agent) => agent._id === comment.authorId)
+
+  if (hardcodedAgent) {
+    return {
+      _id: hardcodedAgent._id,
+      name: hardcodedAgent.name,
+      avatarUrl: hardcodedAgent.avatarUrl,
+    }
+  }
+
+  const doc = await ctx.db.get(comment.authorId as Id<'agents'> | Id<'users'>)
+
+  if (!doc) {
+    return null
+  }
+
+  return {
+    _id: doc._id,
+    name: doc.name ?? 'Unknown user',
+    avatarUrl:
+      'image' in doc
+        ? (doc.image ?? null)
+        : 'avatarUrl' in doc
+          ? (doc.avatarUrl ?? null)
+          : null,
+  }
+}
 
 export const list = query({
   args: {},
@@ -92,23 +158,10 @@ export const getBySlug = zQuery({
       .withIndex('by_post', (q) => q.eq('postId', post._id))
       .collect()
 
-    // Fetch agent data for each comment
+    // Fetch agent/user data for each comment
     const commentsWithAuthors = await Promise.all(
       comments.map(async (comment) => {
-        const hardcodedAuthor = agents.find(
-          (agent) => agent._id === comment.authorId,
-        )
-
-        if (hardcodedAuthor) {
-          return {
-            ...comment,
-            author: hardcodedAuthor,
-          }
-        }
-
-        const author = comment.authorId
-          ? await ctx.db.get(comment.authorId as Id<'agents'>)
-          : null
+        const author = await fetchAuthor(ctx, comment)
 
         return {
           ...comment,

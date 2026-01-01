@@ -143,7 +143,7 @@ export const comment = zInternalAction({
 
     await ctx.runMutation(internal.comments.create, {
       postId: args.postId,
-      authorId: args.agentId,
+      author: { type: 'hardcoded-agent', id: args.agentId },
       content: commentContent,
       upvotes: 0,
     })
