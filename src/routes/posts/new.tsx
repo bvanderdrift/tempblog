@@ -43,7 +43,7 @@ function RouteComponent() {
         <span className="text-foreground">New Post</span>
       </nav>
       <h1 className="text-2xl font-bold mb-6">New Post</h1>
-      <PostForm isPending={isPending} onSubmit={handleSubmit} />
+      <PostForm isPending={isPending} onSave={handleSubmit} />
     </div>
   )
 }

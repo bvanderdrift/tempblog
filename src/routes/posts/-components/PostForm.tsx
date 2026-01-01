@@ -1,7 +1,8 @@
 import { ConfirmPublishDialog } from '@/components/ConfirmPublishDialog'
 import { Button } from '@/components/ui/button'
+import { formatDistanceToNow } from 'date-fns'
 import { Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 export function slugify(text: string): string {
   return text
@@ -17,12 +18,16 @@ interface PostFormProps {
   initialBody?: string
   isPublished?: boolean
   isPending: boolean
-  onSubmit: (data: {
+  onSave: (data: {
     title: string
     body: string
     publishedAt: number | null
+    isAutoSave: boolean
   }) => void
   onCancel?: () => void
+  onAutoSave?: (data: { title: string; body: string }) => void
+  autoSaveInterval?: number
+  lastSavedAt?: number
 }
 
 export function PostForm({
@@ -30,16 +35,42 @@ export function PostForm({
   initialBody = '',
   isPublished = false,
   isPending,
-  onSubmit,
+  onSave,
   onCancel,
+  autoSaveInterval,
+  lastSavedAt,
 }: PostFormProps) {
   const [title, setTitle] = useState(initialTitle)
   const [body, setBody] = useState(initialBody)
+  const lastSavedRef = useRef({ title: initialTitle, body: initialBody })
 
   const isFormValid = title.trim() && body.trim()
 
+  const lastSavedAgoFormatted = useMemo(() => {
+    if (!lastSavedAt) return null
+    return formatDistanceToNow(new Date(lastSavedAt))
+  }, [lastSavedAt])
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!autoSaveInterval) return
+
+    const intervalId = setInterval(() => {
+      const hasChanges =
+        title !== lastSavedRef.current.title ||
+        body !== lastSavedRef.current.body
+
+      if (hasChanges && title.trim() && body.trim()) {
+        onSave({ title, body, publishedAt: null, isAutoSave: true })
+        lastSavedRef.current = { title, body }
+      }
+    }, autoSaveInterval)
+
+    return () => clearInterval(intervalId)
+  }, [onSave, autoSaveInterval, title, body])
+
   const handleSubmit = (publishedAt: number | null) => {
-    onSubmit({ title, body, publishedAt })
+    onSave({ title, body, publishedAt, isAutoSave: false })
   }
 
   return (
@@ -77,7 +108,7 @@ export function PostForm({
           required
         />
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         {onCancel && (
           <Button
             type="button"
@@ -106,6 +137,11 @@ export function PostForm({
               </Button>
             </ConfirmPublishDialog>
           </>
+        )}
+        {lastSavedAgoFormatted && (
+          <span className="text-sm text-muted-foreground">
+            Last auto-saved {lastSavedAgoFormatted} ago
+          </span>
         )}
       </div>
     </form>

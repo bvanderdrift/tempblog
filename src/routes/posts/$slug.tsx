@@ -1,8 +1,11 @@
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog'
 import { ConfirmPublishDialog } from '@/components/ConfirmPublishDialog'
 import { Button } from '@/components/ui/button'
+import { SECOND } from '@/lib/time'
+import { useConvexMutation } from '@convex-dev/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useMutation, useQuery } from 'convex/react'
+import { useQuery } from 'convex/react'
 import { ChevronRight, MessageCircle, Pencil, Send, Trash2 } from 'lucide-react'
 import { useMemo } from 'react'
 import Markdown from 'react-markdown'
@@ -23,9 +26,15 @@ function RouteComponent() {
   const { editing } = Route.useSearch()
   const navigate = Route.useNavigate()
   const post = useQuery(api.posts.getBySlug, { slug })
-  const deletePost = useMutation(api.posts.remove)
-  const publishPost = useMutation(api.posts.publish)
-  const updatePost = useMutation(api.posts.update)
+  const deletePost = useConvexMutation(api.posts.remove)
+  const publishPost = useConvexMutation(api.posts.publish)
+  const {
+    mutateAsync: updatePost,
+    isPending: isUpdating,
+    submittedAt: lastSavedAt,
+  } = useMutation({
+    mutationFn: useConvexMutation(api.posts.update),
+  })
 
   const comments: CommentData[] = useMemo(() => {
     if (!post?.comments) return []
@@ -65,7 +74,12 @@ function RouteComponent() {
     })
   }
 
-  const handleUpdate = async (data: { title: string; body: string }) => {
+  const handleUpdate = async (data: {
+    title: string
+    body: string
+    publishedAt: number | null
+    isAutoSave: boolean
+  }) => {
     if (!post) return
     const newSlug = slugify(data.title)
     await updatePost({
@@ -74,6 +88,9 @@ function RouteComponent() {
       body: data.body,
       slug: newSlug,
     })
+
+    if (data.isAutoSave) return
+
     navigate({ search: {}, replace: true, resetScroll: false })
   }
 
@@ -109,9 +126,11 @@ function RouteComponent() {
           initialTitle={post.title}
           initialBody={post.body}
           isPublished={post.publishedAt !== null}
-          isPending={false}
-          onSubmit={handleUpdate}
+          isPending={isUpdating}
+          onSave={handleUpdate}
           onCancel={handleCancelEdit}
+          autoSaveInterval={3 * SECOND}
+          lastSavedAt={lastSavedAt}
         />
       </div>
     )
