@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { Agent } from './agents'
+import { Comment } from './comments'
 import { Post } from './posts'
 
 export const generateComment = async (
@@ -37,7 +38,7 @@ export const generateComment = async (
 export const generateReply = async (
   agent: Pick<Agent, 'name' | 'backstory' | 'writingStyle'>,
   post: Pick<Post, 'title' | 'body'>,
-  userComment: string,
+  thread: Comment[],
 ) => {
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -51,8 +52,15 @@ export const generateReply = async (
       { role: 'system', content: systemPrompt },
       {
         role: 'user',
-        content: `Original Blog Post Title: ${post.title}\n\nOriginal Blog Post:\n${post.body}\n\n---\n\nThe user replied to your comment with:\n"${userComment}"`,
+        content: `Original Blog Post Title: ${post.title}\n\nOriginal Blog Post:\n${post.body}\n\n`,
       },
+      ...thread.map((comment) => ({
+        role:
+          comment.author?.type === 'user'
+            ? ('user' as const)
+            : ('assistant' as const),
+        content: comment.content,
+      })),
     ],
     temperature: 1.0,
     max_completion_tokens: 300,

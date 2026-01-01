@@ -3,6 +3,7 @@ import { zid } from 'convex-helpers/server/zod4'
 import { z } from 'zod'
 import { agents } from '../prompt-engineering/agents'
 import { internal } from './_generated/api'
+import { Doc, Id } from './_generated/dataModel'
 import { generateReply } from './prompting'
 import {
   zInternalAction,
@@ -55,10 +56,25 @@ export const create = zInternalMutation({
   },
 })
 
-export const getCommentInternal = zInternalQuery({
+/**
+ * Fetches the full thread from the root comment down to the specified comment.
+ * Returns an array of comments ordered from root to the target comment.
+ */
+export const getThreadToComment = zInternalQuery({
   args: { commentId: zid('comments') },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.commentId)
+    const thread: Doc<'comments'>[] = []
+    let currentId: Id<'comments'> | null | undefined = args.commentId
+
+    // Walk up the parent chain to build the thread
+    while (currentId) {
+      const comment: Doc<'comments'> | null = await ctx.db.get(currentId)
+      if (!comment) break
+      thread.unshift(comment) // Add to front to maintain root-to-leaf order
+      currentId = comment.parentCommentId
+    }
+
+    return thread
   },
 })
 
@@ -68,21 +84,19 @@ export const replyToCommentAsAgent = zInternalAction({
     agentId: z.string(),
   },
   handler: async (ctx, args) => {
-    // Get the user's comment that we're replying to
-    const userComment = await ctx.runQuery(
-      internal.comments.getCommentInternal,
+    // Get the full thread from root to the user's comment
+    const thread = await ctx.runQuery(
+      internal.comments.getThreadToComment,
       {
         commentId: args.userCommentId,
       },
     )
 
-    if (!userComment) {
-      throw new Error('User comment not found')
-    }
+    const postId = thread[0].postId
 
     // Get the post for context
     const post = await ctx.runQuery(internal.posts.get, {
-      postId: userComment.postId,
+      postId,
     })
 
     if (!post) {
@@ -96,12 +110,12 @@ export const replyToCommentAsAgent = zInternalAction({
       throw new Error('Agent not found')
     }
 
-    // Generate the agent's reply to the user's comment
-    const replyContent = await generateReply(agent, post, userComment.content)
+    // Generate the agent's reply with full thread context
+    const replyContent = await generateReply(agent, post, thread)
 
     // Create the agent's reply as a response to the user's comment
     await ctx.runMutation(internal.comments.create, {
-      postId: userComment.postId,
+      postId,
       parentCommentId: args.userCommentId,
       author: { type: 'hardcoded-agent', id: args.agentId },
       content: replyContent,
