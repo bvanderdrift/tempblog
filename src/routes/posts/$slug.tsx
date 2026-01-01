@@ -1,7 +1,7 @@
 import { ConfirmDeleteDialog } from '@/components/ConfirmDeleteDialog'
 import { ConfirmPublishDialog } from '@/components/ConfirmPublishDialog'
 import { Button } from '@/components/ui/button'
-import { SECOND } from '@/lib/time'
+import { MINUTE, SECOND } from '@/lib/time'
 import { useConvexMutation } from '@convex-dev/react-query'
 import { useMutation } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -129,7 +129,7 @@ function RouteComponent() {
           isPending={isUpdating}
           onSave={handleUpdate}
           onCancel={handleCancelEdit}
-          autoSaveInterval={3 * SECOND}
+          autoSaveInterval={1 * MINUTE}
           lastSavedAt={lastSavedAt}
         />
       </div>
