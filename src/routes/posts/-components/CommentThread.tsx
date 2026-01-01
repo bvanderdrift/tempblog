@@ -63,6 +63,12 @@ export function CommentThread({ thread }: CommentThreadProps) {
               <Textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
+                onKeyDown={(e) => {
+                  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                    e.preventDefault()
+                    handleReply()
+                  }
+                }}
                 placeholder={`Reply to ${lastComment.author?.name}...`}
                 className="min-h-[80px] text-sm resize-none"
                 autoFocus
