@@ -140,7 +140,7 @@ export function PostForm({
         )}
         {lastSavedAgoFormatted && (
           <span className="text-sm text-muted-foreground">
-            Last auto-saved {lastSavedAgoFormatted} ago
+            Auto-saved {lastSavedAgoFormatted} ago
           </span>
         )}
       </div>
